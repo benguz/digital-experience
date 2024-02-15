@@ -32,30 +32,154 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap"
     rel="stylesheet">
+    <style>
+        * {
+            cursor: none !important;;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Poppins
+        }
+        .cursor {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #2804AA;
+            pointer-events: none;
+        }
+        .wall {
+            width: 100%;
+            height: 10vh;
+            background-color: rgba(133, 133, 133, 0.591);
+            position: absolute;
+        }
+        #wall1 { bottom: 0;}
+        #wall2 { bottom: 20vh; width: 90%; right: 10%;}
+        #wall3 { bottom: 40vh; width: 90%; left: 10%; }
+        #wall4 { bottom: 60vh; width: 90%; right: 10%;}
+        #wall5 { bottom: 80vh; width: 90%; left: 10%;}
+        .obstacle {
+            width: 10%;
+            height: 10vh;
+            position: absolute;
+        }
+        .water {
+            background-color: #e67575df;
+
+        }
+        .fire {
+            background-color: #2804aad8
+
+        }
+        #obs1 { bottom: 20vh; right: 0; }
+        #obs2 { bottom: 40vh; left: 0; }
+        #obs3 { bottom: 60vh; right: 0; }
+        #obs4 { bottom: 80vh; left: 0; }
+    </style>
 </head>
 
 <body>
-    <h1>Hi</h1>
+    <p id="type" style="position: absolute; top: 10px; right: 10px"></p>
+    <!-- <div id="select" style="display: flex; flex-direction: row; justify-content: center; align-items: center; position: absolute; z-index: 10; width: 400px; height: 400px; left: calc(50% - 200px); background-color: white;">
+        <button onclick="selected('water')">water boy</button>
+        <button onclick="selected('fire')">fire girl</button>
+    </div> -->
     <button id="myButton">click me</button>
+    <div id="your-cursor" class="cursor"></div>
+    <div id="wall1" class="wall"></div>
+    <div id="obs1" class="obstacle water"></div>
+
+    <div id="wall2" class="wall"></div>
+    <div id="obs2" class="obstacle fire"></div>
+
+    <div id="wall3" class="wall"></div>
+    <div id="obs3" class="obstacle water"></div>
+
+    <div id="wall4" class="wall"></div>
+    <div id="obs4" class="obstacle fire"></div>
+
+    <div id="wall5" class="wall"></div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+//         let chosen = 'water';
+//         function selected(choice) {
+//             chosen = choice;
+//             document.getElementById('select').style.display = 'none';
+//             var allElements = document.getElementsByTagName("*");
+// for (var i = 0, len = allElements.length; i < len; i++) {
+//     var element = allElements[i];
+//     // element.style.border = ...
+// }
+//             runIt()
+//         } 
 
-document.addEventListener('mousemove', (event) => {
+        let type = 'water'
+        let customCursor = document.getElementById('your-cursor');
+
+        const socket = io();
+        socket.on('userDetails', (data) => {
+            console.log("You are a " + data.userType + " user.");
+            type = data.userType
+            document.getElementById('type').textContent = 'you... are... ' + data.userType + "person!!!";
+            customCursor.style.backgroundColor = data.userColor
+        });
+let lastX = 0;
+let lastY = 0;
+    document.addEventListener('mousemove', (event) => {
     const { pageX, pageY } = event;
-    socket.emit('cursorMove', { x: pageX, y: pageY });
+    // const deltaX = pageX - lastX;
+    // const deltaY = pageY - lastY;
+    // let newCursorX = parseInt(customCursor.style.left || 0) + deltaX;
+    // let newCursorY = parseInt(customCursor.style.top || 0) + deltaY;
+
+    if (!isColliding(pageX , pageY)) { // use newcursor for if, not else
+
+        socket.emit('cursorMove', { x: pageX, y: pageY });
+        customCursor.style.left = pageX  + 'px';
+        customCursor.style.top = pageY + 'px';
+    } else {
+        // customCursor.style.left = '10px';
+        // customCursor.style.top = '10px';
+        // socket.emit('cursorMove', { x: 10, y: 10 });
+
+    }
+    // lastX = pageX;
+    // lastY = pageY;
 });
+
+function isColliding(x, y) {
+    const cursorRect = customCursor.getBoundingClientRect();
+    const walls = document.querySelectorAll(".wall");
+
+    for (let wall of walls) {
+        const rect = wall.getBoundingClientRect();
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+            return true;
+        }
+    }
+    const obs = document.querySelectorAll(`.${type}`);
+    for (let ob of obs) {
+        const rect = ob.getBoundingClientRect();
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+            return true;
+        }
+    }
+    return false;
+}
 
 socket.on('cursorMove', (data) => {
     let cursor = document.getElementById(data.id);
             if (!cursor) {
                 cursor = document.createElement('div');
                 cursor.id = data.id;
-                cursor.style.position = 'absolute';
-                cursor.style.width = '10px';
-                cursor.style.height = '10px';
-                cursor.style.backgroundColor = 'red';
-                cursor.style.borderRadius = '50%';
+                cursor.classList.add('cursor');
+                cursor.style.backgroundColor = data.type;
                 document.body.appendChild(cursor);
             }
             cursor.style.left = data.x + 'px';
@@ -78,6 +202,7 @@ socket.on('removeCursor', (data) => {
         cursor.remove();
     }
 });
+
 
 
     </script>
