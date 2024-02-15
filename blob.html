@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 
+    - primary meta tag
+  -->
+  <title>Romance</title>
+  <meta name="title" content="Romance">
+  <meta name="description" content="Inspiring student agency nationwide with research-tested strategies. Changing education through students, not policy. Coming soon to a TikTok feed near you.">
+  <meta property="og:url" content="https://doorstopped.org">
+  <meta property="og:title" content="Changing education through students, not policy.">
+  <meta property="og:description" content="Inspiring student agency nationwide with research-tested strategies">
+  <meta property="og:image" content="https://doorstopped.org/og.jpg">
+  <meta name="twitter:image" content="https://doorstopped.org/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- 
+    - favicon
+  -->
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+
+  <!-- 
+    - google font link
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap"
+    rel="stylesheet">
+    <style>
+        /* * {
+            cursor: none !important;;
+        } */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif
+        }
+        .cursor {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #2804AA;
+            pointer-events: none;
+        }
+        .wall {
+            width: 100%;
+            height: 10vh;
+            background-color: rgba(133, 133, 133, 0.591);
+            position: absolute;
+        }
+        #wall1 { bottom: 0;}
+        #wall2 { bottom: 20vh; width: 90%; right: 10%;}
+        #wall3 { bottom: 40vh; width: 90%; left: 10%; }
+        #wall4 { bottom: 60vh; width: 90%; right: 10%;}
+        #wall5 { bottom: 80vh; width: 90%; left: 10%;}
+        .obstacle {
+            width: 10%;
+            height: 10vh;
+            position: absolute;
+        }
+        .water {
+            background-color: #e67575df;
+
+        }
+        .fire {
+            background-color: #2804aad8
+
+        }
+        .blob {
+            width: 50px;
+            height: 50px;
+            background-color: #7f66d9d8;
+            background-image: url('/smiley.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 20px 10px;
+            position: absolute;
+            border-radius: 50%;
+        }
+        .projectile {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="blob" class="blob"></div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+const socket = io();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const blobs = {};
+    const blob = document.getElementById('blob');
+    let x = 0, y = 0;
+
+    let velocityX = 0, velocityY = 0;
+    let acceleration = 0.5;
+    let friction = .90;
+    let maxSpeed = 5;
+
+    const keys = {
+        w: false,
+        s: false,
+        a: false,
+        d: false
+    };
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key in keys) {
+            keys[e.key] = true;
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        if (e.key in keys) {
+            keys[e.key] = false;
+        }
+    });
+
+    function updatePosition() {
+        if (keys.w) velocityY -= acceleration;
+        if (keys.s) velocityY += acceleration;
+        if (keys.a) velocityX -= acceleration;
+        if (keys.d) velocityX += acceleration;
+
+        // Apply friction
+        velocityX *= friction;
+        velocityY *= friction;
+
+        // Limit maximum speed
+        velocityX = Math.max(Math.min(velocityX, maxSpeed), -maxSpeed);
+        velocityY = Math.max(Math.min(velocityY, maxSpeed), -maxSpeed);
+
+        // Update position
+        x += velocityX;
+        y += velocityY;
+        blob.style.transform = `translate(${x}px, ${y}px)`;
+        socket.emit('blobMoved', { x: x, y: y });
+
+        requestAnimationFrame(updatePosition);
+    }
+
+    socket.on('blobRemoved', (socketId) => {
+        // Remove the blob element when the user disconnects
+        if (blobs[socketId]) {
+            document.body.removeChild(blobs[socketId]);
+            delete blobs[socketId];
+        }
+    });
+    
+    socket.on('blobMoved', (data) => {
+        if (!blobs[data.socketId]) {
+            // Create a new blob for the connected user if it doesn't exist
+            blobs[data.socketId] = document.createElement('div');
+            blobs[data.socketId].className = 'blob'; 
+            blob.id = data.socketId;
+            blobs[data.socketId].style.backgroundColor = "#e67575df"
+            document.body.appendChild(blobs[data.socketId]);
+        }
+        // Update the position of the other user's blob
+        blobs[data.socketId].style.transform = `translate(${data.position.x}px, ${data.position.y}px)`;
+    });
+
+    updatePosition();
+
+    document.addEventListener('click', (e) => {
+        const projectile = document.createElement('div');
+        projectile.style.left = `${x + 25}px`; // Center of blob
+        projectile.style.top = `${y + 25}px`; // Center of blob
+        projectile.classList.add('projectile');
+        projectile.textContent = "❤️";
+        document.body.appendChild(projectile);
+
+        const angle = Math.atan2(e.clientY - y - 25, e.clientX - x - 25);
+        const velocity = { x: Math.cos(angle) * 10, y: Math.sin(angle) * 10 };
+        const projectileData = {
+            x: x + 25,
+            y: y + 25,
+            targetX: e.clientX,
+            targetY: e.clientY
+        };
+        socket.emit('shoot', projectileData);
+        let projX = x + 25;
+        let projY = y + 25;
+        function moveProjectile() {
+            projX += velocity.x;
+            projY += velocity.y;
+            projectile.style.left = `${projX}px`;
+            projectile.style.top = `${projY}px`;
+
+            if (projX < 0 || projX > window.innerWidth ||
+            projY < 0 || projY > window.innerHeight) {
+                document.body.removeChild(projectile);
+                return
+            } else {
+                for (const id in blobs) {   
+                    const blobElem = blobs[id];                 
+                    const blobRect = blobElem.getBoundingClientRect();
+                    const projectileRect = projectile.getBoundingClientRect();
+                    console.log('check');
+
+                    if (projectileRect.left < blobRect.right && projectileRect.right > blobRect.left &&
+                        projectileRect.top < blobRect.bottom && projectileRect.bottom > blobRect.top) {
+                        console.log('collide');
+                        document.body.removeChild(projectile);
+                        blobElem.style.width = blobElem.offsetWidth + 2 + "px";
+                        blobElem.style.height = blobElem.offsetHeight + 2 + "px";
+                        const collisionData = {
+                            blobId: blobElem.id // not in use
+                        };
+
+                        socket.emit('projectileCollision', collisionData);
+                        return;
+                    }
+                }                
+
+            }
+
+                requestAnimationFrame(moveProjectile);
+              
+        }
+
+        moveProjectile();
+    });
+
+    socket.on('projectileShot', (projectileData) => {
+        const newProjectile = document.createElement('div');
+        newProjectile.style.left = `${projectileData.x}px`;
+        newProjectile.style.top = `${projectileData.y}px`;
+        newProjectile.classList.add('projectile');
+        newProjectile.textContent = "❤️";
+
+        document.body.appendChild(newProjectile);
+        
+        // Calculate the angle to the target position
+        const angle = Math.atan2(projectileData.targetY - projectileData.y, projectileData.targetX - projectileData.x);
+        const velocity = { x: Math.cos(angle) * 10, y: Math.sin(angle) * 10 };
+        function moveProjectile() {
+            projectileData.x += velocity.x;
+            projectileData.y += velocity.y;
+            newProjectile.style.left = `${projectileData.x}px`;
+            newProjectile.style.top = `${projectileData.y}px`;
+            // Check if the projectile is out of bounds
+            if (projectileData.x < 0 || projectileData.x > window.innerWidth ||
+                projectileData.y < 0 || projectileData.y > window.innerHeight) {
+                document.body.removeChild(newProjectile);
+                return;
+
+            }  else {
+                const blobRect = blob.getBoundingClientRect();
+                const projectileRect = newProjectile.getBoundingClientRect();
+
+                if (projectileRect.left < blobRect.right && projectileRect.right > blobRect.left &&
+                    projectileRect.top < blobRect.bottom && projectileRect.bottom > blobRect.top) {
+                    document.body.removeChild(newProjectile);
+                    blob.style.width = blob.offsetWidth + 2 + "px";
+                    blob.style.height = blob.offsetHeight + 2 + "px";
+
+
+                    return;
+                    }
+            }
+                requestAnimationFrame(moveProjectile);
+            
+        }
+        moveProjectile()
+    });
+
+});
+
+
+
+// function isColliding(object, x, y) {
+//     const cursorRect = object.getBoundingClientRect();
+//     const walls = document.querySelectorAll(".blob");
+
+//     for (let wall of walls) {
+//         const rect = wall.getBoundingClientRect();
+//         if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+//             return wall;
+//         }
+//     }
+    
+//     return null;
+// }
+
+
+
+socket.on('colorChanged', (color) => {
+    removeObs(color);
+});
+
+socket.on('removeCursor', (data) => {
+    const cursor = document.getElementById(data.id);
+    if (cursor) {
+        cursor.remove();
+    }
+});
+
+
+
+    </script>
+</body>

@@ -22,7 +22,8 @@
   <!-- 
     - favicon
   -->
-  <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
 
   <!-- 
     - google font link
@@ -42,7 +43,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            font-family: Poppins
+            font-family: 'Poppins', sans-serif
         }
         .cursor {
             position: absolute;
@@ -89,7 +90,7 @@
         <button onclick="selected('water')">water boy</button>
         <button onclick="selected('fire')">fire girl</button>
     </div> -->
-    <button id="myButton">click me</button>
+    <button id="myButton" onclick="removeObs('obs1')">!</button>
     <div id="your-cursor" class="cursor"></div>
     <div id="wall1" class="wall"></div>
     <div id="obs1" class="obstacle water"></div>
@@ -153,6 +154,12 @@ let lastY = 0;
     // lastY = pageY;
 });
 
+function removeObs(thisObstacle) {
+    document.getElementById(thisObstacle).style.display = 'none';
+    document.getElementById(thisObstacle).classList.remove('water', 'fire');
+    socket.emit('changeColor', thisObstacle);
+}
+
 function isColliding(x, y) {
     const cursorRect = customCursor.getBoundingClientRect();
     const walls = document.querySelectorAll(".wall");
@@ -186,14 +193,9 @@ socket.on('cursorMove', (data) => {
             cursor.style.top = data.y + 'px';
 });
 
-const button = document.getElementById('myButton');
-button.addEventListener('click', () => {
-    const newColor = 'blue'; // Example color
-    socket.emit('changeColor', newColor);
-});
 
 socket.on('colorChanged', (color) => {
-    button.style.backgroundColor = color;
+    removeObs(color);
 });
 
 socket.on('removeCursor', (data) => {

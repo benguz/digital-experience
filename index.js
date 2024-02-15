@@ -17,8 +17,8 @@ io.on('connection', (socket) => {
     console.log(`A user connected - ${userCount} users`);
     let userType = userCount % 2 === 0 ? 'fire' : 'water';
     let userColor = userCount % 2 === 0 ? '#ed5555' : '#2804AA';
-    
-    socket.emit('userDetails', { userType, userColor });
+    let id = socket.id;
+    socket.emit('userDetails', { userType, userColor,  id});
 
     socket.on('cursorMove', (data) => {
         data.id = socket.id; // Assign the socket ID
@@ -26,12 +26,28 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('cursorMove', data);
     });
 
+    socket.on('blobMoved', (position) => {
+        // Broadcast the new position to all other clients except the sender
+        socket.broadcast.emit('blobMoved', { socketId: socket.id, position: position });
+    });
+
     socket.on('changeColor', (color) => {
         io.emit('colorChanged', color);
     });
+
+    socket.on('shoot', (projectileData) => {
+        socket.broadcast.emit('projectileShot', projectileData);
+    });
+
+    socket.on('projectileCollision', (collisionData) => {
+        socket.broadcast.emit('youAreHit', collisionData);
+    });
+
     socket.on('disconnect', () => {
         console.log('A user disconnected: ' + socket.id);
         socket.broadcast.emit('removeCursor', { id: socket.id });
+        socket.broadcast.emit('blobRemoved', socket.id);
+
         userCount--;
     });
 });
@@ -40,6 +56,10 @@ io.on('connection', (socket) => {
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/index.html'));
+});
+
+app.get('/blob', (req, res) => {
+    res.sendFile(path.join(__dirname, '/blob.html'));
 });
 
 server.listen(port, () => {
