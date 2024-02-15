@@ -5,6 +5,7 @@ const path = require('path');
 
 
 const app = express();
+const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = socketIo(server);
 
@@ -33,6 +34,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/index.html'));
 });
 
-server.listen(3000, () => {
-    console.log('Server listening on port 3000');
+server.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
 });
