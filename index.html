@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 
+    - primary meta tag
+  -->
+  <title>Romance</title>
+  <meta name="title" content="Romance">
+  <meta name="description" content="Inspiring student agency nationwide with research-tested strategies. Changing education through students, not policy. Coming soon to a TikTok feed near you.">
+  <meta property="og:url" content="https://doorstopped.org">
+  <meta property="og:title" content="Changing education through students, not policy.">
+  <meta property="og:description" content="Inspiring student agency nationwide with research-tested strategies">
+  <meta property="og:image" content="https://doorstopped.org/og.jpg">
+  <meta name="twitter:image" content="https://doorstopped.org/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- 
+    - favicon
+  -->
+  <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+
+  <!-- 
+    - google font link
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+    <h1>Hi</h1>
+    <button id="myButton">click me</button>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+document.addEventListener('mousemove', (event) => {
+    const { pageX, pageY } = event;
+    socket.emit('cursorMove', { x: pageX, y: pageY });
+});
+
+socket.on('cursorMove', (data) => {
+    let cursor = document.getElementById(data.id);
+            if (!cursor) {
+                cursor = document.createElement('div');
+                cursor.id = data.id;
+                cursor.style.position = 'absolute';
+                cursor.style.width = '10px';
+                cursor.style.height = '10px';
+                cursor.style.backgroundColor = 'red';
+                cursor.style.borderRadius = '50%';
+                document.body.appendChild(cursor);
+            }
+            cursor.style.left = data.x + 'px';
+            cursor.style.top = data.y + 'px';
+});
+
+const button = document.getElementById('myButton');
+button.addEventListener('click', () => {
+    const newColor = 'blue'; // Example color
+    socket.emit('changeColor', newColor);
+});
+
+socket.on('colorChanged', (color) => {
+    button.style.backgroundColor = color;
+});
+
+socket.on('removeCursor', (data) => {
+    const cursor = document.getElementById(data.id);
+    if (cursor) {
+        cursor.remove();
+    }
+});
+
+
+    </script>
+</body>
