@@ -109,8 +109,8 @@ const socket = io();
         document.addEventListener('DOMContentLoaded', () => {
             const blobs = {};
     const blob = document.getElementById('blob');
-    let x = 0, y = 0;
-
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+            
     let velocityX = 0, velocityY = 0;
     let acceleration = 0.5;
     let friction = .90;
@@ -182,23 +182,24 @@ const socket = io();
     updatePosition();
     document.addEventListener('click', (e) => {
         const projectile = document.createElement('div');
-        projectile.style.left = `${x + 25}px`; // Center of blob
-        projectile.style.top = `${y + 25}px`; // Center of blob
+        let blobSize = blob.offsetWidth / 2;
+        projectile.style.left = `${x + blobSize}px`; // Center of blob
+        projectile.style.top = `${y + blobSize}px`; // Center of blob
         projectile.classList.add('projectile');
         projectile.textContent = "❤️";
         document.body.appendChild(projectile);
 
-        const angle = Math.atan2(e.clientY - y - 25, e.clientX - x - 25);
+        const angle = Math.atan2(e.clientY - y - blobSize, e.clientX - x - blobSize);
         const velocity = { x: Math.cos(angle) * 10, y: Math.sin(angle) * 10 };
         const projectileData = {
-            x: x + 25,
-            y: y + 25,
+            x: x + blobSize,
+            y: y + blobSize,
             targetX: e.clientX,
             targetY: e.clientY
         };
         socket.emit('shoot', projectileData);
-        let projX = x + 25;
-        let projY = y + 25;
+        let projX = x + blobSize;
+        let projY = y + blobSize;
         function moveProjectile() {
             projX += velocity.x;
             projY += velocity.y;
@@ -302,17 +303,12 @@ const socket = io();
 // }
 
 
-
-socket.on('colorChanged', (color) => {
-    removeObs(color);
-});
-
-socket.on('removeCursor', (data) => {
-    const cursor = document.getElementById(data.id);
-    if (cursor) {
-        cursor.remove();
-    }
-});
+// socket.on('removeCursor', (data) => {
+//     const cursor = document.getElementById(data.id);
+//     if (cursor) {
+//         cursor.remove();
+//     }
+// });
 
 
 

@@ -15,38 +15,41 @@ app.use(express.static('public'));
 io.on('connection', (socket) => {
     userCount++;
     console.log(`A user connected - ${userCount} users`);
-    let userType = userCount % 2 === 0 ? 'fire' : 'water';
-    let userColor = userCount % 2 === 0 ? '#ed5555' : '#2804AA';
-    let id = socket.id;
-    socket.emit('userDetails', { userType, userColor,  id});
+        // Extract the room name from the URL
+    const roomName = socket.handshake.headers.referer.split('/').pop();
 
-    socket.on('cursorMove', (data) => {
-        data.id = socket.id; // Assign the socket ID
-        data.type = userColor;
-        socket.broadcast.emit('cursorMove', data);
-    });
+    // Join the room
+    socket.join(roomName);
+
+    console.log(roomName)
+    // let userType = userCount % 2 === 0 ? 'fire' : 'water';
+    // let userColor = userCount % 2 === 0 ? '#ed5555' : '#2804AA';
+    // let id = socket.id;
+    // socket.emit('userDetails', { userType, userColor,  id});
+
+    // socket.on('cursorMove', (data) => {
+    //     data.id = socket.id; // Assign the socket ID
+    //     data.type = userColor;
+    //     socket.broadcast.emit('cursorMove', data);
+    // });
 
     socket.on('blobMoved', (position) => {
         // Broadcast the new position to all other clients except the sender
-        socket.broadcast.emit('blobMoved', { socketId: socket.id, position: position });
-    });
-
-    socket.on('changeColor', (color) => {
-        io.emit('colorChanged', color);
+        socket.broadcast.to(roomName).emit('blobMoved', { socketId: socket.id, position: position });
     });
 
     socket.on('shoot', (projectileData) => {
-        socket.broadcast.emit('projectileShot', projectileData);
+        socket.broadcast.to(roomName).emit('projectileShot', projectileData);
     });
 
     socket.on('projectileCollision', (collisionData) => {
-        socket.broadcast.emit('youAreHit', collisionData);
+        socket.broadcast.to(roomName).emit('youAreHit', collisionData);
     });
 
     socket.on('disconnect', () => {
         console.log('A user disconnected: ' + socket.id);
-        socket.broadcast.emit('removeCursor', { id: socket.id });
-        socket.broadcast.emit('blobRemoved', socket.id);
+        socket.broadcast.to(roomName).emit('removeCursor', { id: socket.id });
+        socket.broadcast.to(roomName).emit('blobRemoved', socket.id);
 
         userCount--;
     });
@@ -58,7 +61,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/index.html'));
 });
 
-app.get('/blob', (req, res) => {
+app.get('/blob/*', (req, res) => {
     res.sendFile(path.join(__dirname, '/blob.html'));
 });
 

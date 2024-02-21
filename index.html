@@ -35,7 +35,9 @@
     rel="stylesheet">
     <style>
         * {
-            cursor: none !important;;
+            box-sizing: border-box;
+            position: relative;
+            min-width: 0;
         }
         body, html {
             margin: 0;
@@ -45,167 +47,126 @@
             overflow: hidden;
             font-family: 'Poppins', sans-serif
         }
-        .cursor {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #2804AA;
-            pointer-events: none;
-        }
-        .wall {
-            width: 100%;
-            height: 10vh;
-            background-color: rgba(133, 133, 133, 0.591);
-            position: absolute;
-        }
-        #wall1 { bottom: 0;}
-        #wall2 { bottom: 20vh; width: 90%; right: 10%;}
-        #wall3 { bottom: 40vh; width: 90%; left: 10%; }
-        #wall4 { bottom: 60vh; width: 90%; right: 10%;}
-        #wall5 { bottom: 80vh; width: 90%; left: 10%;}
-        .obstacle {
-            width: 10%;
-            height: 10vh;
-            position: absolute;
-        }
-        .water {
-            background-color: #e67575df;
+        
+.input-container {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+}
 
-        }
-        .fire {
-            background-color: #2804aad8
+.input-container input[type="text"] {
+    flex-grow: 1; 
+    max-width: 60%;
+    border: 2px solid #ccc; /* Border for the input */
+    padding: 8px; /* Padding inside the input field */
+    border-radius: 4px 0 0 4px; /* Rounded corners on the left side */
+    border-right: none; /* Remove right border to merge with button */
+    font-family: 'Poppins', sans-serif;
 
-        }
-        #obs1 { bottom: 20vh; right: 0; }
-        #obs2 { bottom: 40vh; left: 0; }
-        #obs3 { bottom: 60vh; right: 0; }
-        #obs4 { bottom: 80vh; left: 0; }
+}
+
+.input-container input[type="submit"] {
+    padding: 8px 16px; /* Padding inside the button */
+    border: 2px solid #ccc; /* Border for the button */
+    font-family: 'Poppins', sans-serif;
+    background-color: rgb(211, 214, 238);
+    
+    border-radius: 0 4px 4px 0; /* Rounded corners on the right side */
+    border-left: none; /* Remove left border to merge with input field */
+    cursor: pointer; /* Cursor changes to pointer when hovering over the button */
+    transition: 0.15s;
+}
+
+.input-container input[type="submit"]:hover {
+    background-color: rgb(211, 214, 255);
+}
+
+p.subtitle {
+    font-size: 10pt;
+    color: gray;
+    margin-top: 0;
+    text-align: left;
+}
+
+h1 {
+    font-size: 20pt;
+    margin: 0;
+}
+
+.essay-button {
+    display: inline-block;
+    background-color: rgb(211, 214, 238);
+    font-family: Poppins, sans-serif;
+    background-color: white;
+    border-radius: 10px;
+    background-color: rgb(211, 214, 238);
+        margin: 6px;
+    padding: 10px;
+    position: relative;
+    border: none;
+    transition: 0.15s;
+  }
+  .essay-button:hover {
+    cursor: pointer;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+
+  }
+  #demo {
+    position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  display: block;
+margin: 0 auto;
+
+  }
     </style>
 </head>
 
 <body>
-    <p id="type" style="position: absolute; top: 10px; right: 10px"></p>
-    <!-- <div id="select" style="display: flex; flex-direction: row; justify-content: center; align-items: center; position: absolute; z-index: 10; width: 400px; height: 400px; left: calc(50% - 200px); background-color: white;">
-        <button onclick="selected('water')">water boy</button>
-        <button onclick="selected('fire')">fire girl</button>
-    </div> -->
-    <button id="myButton" onclick="removeObs('obs1')">!</button>
-    <div id="your-cursor" class="cursor"></div>
-    <div id="wall1" class="wall"></div>
-    <div id="obs1" class="obstacle water"></div>
+    <div style="width: 50%; height: 60%; margin: auto; position: relative; margin-top: 20vh; padding: 35px; border-radius: 15px; background-color: white;     -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);">
+         <h1>Love is Blob 🤗🤗</h1>
+         <p class="subtitle" style="font-size: 13pt; margin-bottom: 0;">The cutest game for friends and couples</p>
+         <p style="color: black; text-wrap: pretty; margin-top: 10px;">Join a room, share the link with your friends, use WASD to move around, and click for a ❤️❤️ surprise</p>
+         <div class="input-container" autocomplete="off">
+             <input type="text" id="key" placeholder="enter any room name" spellcheck="false" autocapitalize="off">
+             <input id="key-form" type="submit" value="play!">
+     </div>
+     <p class="subtitle" >A shareable link will be copied to your clipboard!</p>
+     <button class="essay-button" onclick="createRoom()" style="margin-left: 0">create a random room</button>
+     <p class="subtitle" style="text-align: center; position: absolute; bottom: 5px; width: 70%; left: 15%" >made with 💖 by ben and allison</p>
 
-    <div id="wall2" class="wall"></div>
-    <div id="obs2" class="obstacle fire"></div>
+</div>
+<video autoplay playsinline muted loop id="demo">
+    <source src="love.mp4" >
+  </video>  
+   
 
-    <div id="wall3" class="wall"></div>
-    <div id="obs3" class="obstacle water"></div>
 
-    <div id="wall4" class="wall"></div>
-    <div id="obs4" class="obstacle fire"></div>
-
-    <div id="wall5" class="wall"></div>
-
-    <script src="/socket.io/socket.io.js"></script>
     <script>
-//         let chosen = 'water';
-//         function selected(choice) {
-//             chosen = choice;
-//             document.getElementById('select').style.display = 'none';
-//             var allElements = document.getElementsByTagName("*");
-// for (var i = 0, len = allElements.length; i < len; i++) {
-//     var element = allElements[i];
-//     // element.style.border = ...
-// }
-//             runIt()
-//         } 
-
-        let type = 'water'
-        let customCursor = document.getElementById('your-cursor');
-
-        const socket = io();
-        socket.on('userDetails', (data) => {
-            console.log("You are a " + data.userType + " user.");
-            type = data.userType
-            document.getElementById('type').textContent = 'you... are... ' + data.userType + "person!!!";
-            customCursor.style.backgroundColor = data.userColor
+        document.getElementById('key-form').addEventListener('click', function(event) {
+            let textToCopy = 'blob/' + document.getElementById('key').value;
+            copyClip('https://loveisblob.com/' + textToCopy)
+            window.open(textToCopy)
         });
-let lastX = 0;
-let lastY = 0;
-    document.addEventListener('mousemove', (event) => {
-    const { pageX, pageY } = event;
-    // const deltaX = pageX - lastX;
-    // const deltaY = pageY - lastY;
-    // let newCursorX = parseInt(customCursor.style.left || 0) + deltaX;
-    // let newCursorY = parseInt(customCursor.style.top || 0) + deltaY;
-
-    if (!isColliding(pageX , pageY)) { // use newcursor for if, not else
-
-        socket.emit('cursorMove', { x: pageX, y: pageY });
-        customCursor.style.left = pageX  + 'px';
-        customCursor.style.top = pageY + 'px';
-    } else {
-        // customCursor.style.left = '10px';
-        // customCursor.style.top = '10px';
-        // socket.emit('cursorMove', { x: 10, y: 10 });
-
+        // add function on pressing enter
+    function copyClip(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
     }
-    // lastX = pageX;
-    // lastY = pageY;
-});
-
-function removeObs(thisObstacle) {
-    document.getElementById(thisObstacle).style.display = 'none';
-    document.getElementById(thisObstacle).classList.remove('water', 'fire');
-    socket.emit('changeColor', thisObstacle);
-}
-
-function isColliding(x, y) {
-    const cursorRect = customCursor.getBoundingClientRect();
-    const walls = document.querySelectorAll(".wall");
-
-    for (let wall of walls) {
-        const rect = wall.getBoundingClientRect();
-        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-            return true;
-        }
+    function createRoom() {
+        let r = (Math.random() + 1).toString(36).substring(7);
+        copyClip('https://loveisblob.com/blob/' + r)
+        window.open('/blob/' + r);
+        
     }
-    const obs = document.querySelectorAll(`.${type}`);
-    for (let ob of obs) {
-        const rect = ob.getBoundingClientRect();
-        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-            return true;
-        }
-    }
-    return false;
-}
-
-socket.on('cursorMove', (data) => {
-    let cursor = document.getElementById(data.id);
-            if (!cursor) {
-                cursor = document.createElement('div');
-                cursor.id = data.id;
-                cursor.classList.add('cursor');
-                cursor.style.backgroundColor = data.type;
-                document.body.appendChild(cursor);
-            }
-            cursor.style.left = data.x + 'px';
-            cursor.style.top = data.y + 'px';
-});
-
-
-socket.on('colorChanged', (color) => {
-    removeObs(color);
-});
-
-socket.on('removeCursor', (data) => {
-    const cursor = document.getElementById(data.id);
-    if (cursor) {
-        cursor.remove();
-    }
-});
-
-
-
+        
     </script>
 </body>
