@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('A user disconnected: ' + socket.id);
-        socket.broadcast.to(roomName).emit('removeCursor', { id: socket.id });
+        // socket.broadcast.to(roomName).emit('removeCursor', { id: socket.id });
         socket.broadcast.to(roomName).emit('blobRemoved', socket.id);
 
         userCount--;

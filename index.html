@@ -24,6 +24,7 @@
   -->
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+  <script defer data-domain="loveisblob.com" src="https://plausible.io/js/script.js"></script>
 
   <!-- 
     - google font link
@@ -122,12 +123,29 @@ h1 {
 margin: 0 auto;
 
   }
+  #main-intro {
+    width: 50%; height: 60%; margin: auto; position: relative; margin-top: 20vh; padding: 35px; border-radius: 15px; background-color: white;     -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+  #credit {
+    text-align: center; position: absolute; bottom: 5px; width: 70%; left: 15%
+  }
+
+  @media screen and (max-width: 768px) {
+    #main-intro {
+        width: 95%; height: 70%;
+        margin-top: 15vh;
+        padding: 18px;
+    }
+    #credit {
+        width: 95%; left: 2.5%;
+    }
+  }
     </style>
 </head>
 
 <body>
-    <div style="width: 50%; height: 60%; margin: auto; position: relative; margin-top: 20vh; padding: 35px; border-radius: 15px; background-color: white;     -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);">
+    <div class="main-intro">
          <h1>Love is Blob 🤗🤗</h1>
          <p class="subtitle" style="font-size: 13pt; margin-bottom: 0;">The cutest game for friends and couples</p>
          <p style="color: black; text-wrap: pretty; margin-top: 10px;">Join a room, share the link with your friends, use WASD to move around, and click for a ❤️❤️ surprise</p>
@@ -137,8 +155,7 @@ margin: 0 auto;
      </div>
      <p class="subtitle" >A shareable link will be copied to your clipboard!</p>
      <button class="essay-button" onclick="createRoom()" style="margin-left: 0">create a random room</button>
-     <p class="subtitle" style="text-align: center; position: absolute; bottom: 5px; width: 70%; left: 15%" >made with 💖 by ben and allison</p>
-
+     <p class="subtitle" id="credit" >made with 💖 by ben and allison</p>
 </div>
 <video autoplay playsinline muted loop id="demo">
     <source src="love.mp4" >

@@ -28,6 +28,8 @@
   <!-- 
     - google font link
   -->
+  <script defer data-domain="loveisblob.com" src="https://plausible.io/js/script.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -240,7 +242,7 @@ const socket = io();
 
         moveProjectile();
     });
-
+    // instead of spawning from center the hearts should spawn from the edge of the blob
     socket.on('projectileShot', (projectileData) => {
         const newProjectile = document.createElement('div');
         newProjectile.style.left = `${projectileData.x}px`;
@@ -285,7 +287,6 @@ const socket = io();
     });
 
 });
-
 
 
 // function isColliding(object, x, y) {
