@@ -166,7 +166,7 @@ margin: 0 auto;
     <script>
         document.getElementById('key-form').addEventListener('click', function(event) {
             let textToCopy = 'blob/' + document.getElementById('key').value;
-            copyClip('https://loveisblob.com/' + textToCopy)
+            copyClip('https://blob.benguzovsky.com/' + textToCopy)
             window.open(textToCopy)
         });
         // add function on pressing enter
@@ -180,7 +180,7 @@ margin: 0 auto;
     }
     function createRoom() {
         let r = (Math.random() + 1).toString(36).substring(7);
-        copyClip('https://loveisblob.com/blob/' + r)
+        copyClip('https://blob.benguzovsky.com/blob/' + r)
         window.open('/blob/' + r);
         
     }
